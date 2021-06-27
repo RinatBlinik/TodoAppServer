@@ -4,12 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TodoAppServer.Contexts;
 using Microsoft.EntityFrameworkCore;
 using TodoAppServer.Services;
@@ -38,11 +33,16 @@ namespace TodoAppServer
             });
             services.AddCors(options =>
             {
+                string allowedOriginsStr = Configuration.GetValue<string>("AllowedOrigins");
+                string[] allowedOrigins = new string[0];
+                if (!string.IsNullOrEmpty(allowedOriginsStr))
+                {
+                    allowedOrigins = allowedOriginsStr.Split(",");
+                }
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   builder =>
                                   {
-                                      builder.WithOrigins("http://localhost:4200",
-                                          "http://localhost")
+                                      builder.WithOrigins(allowedOrigins)
                                       .AllowAnyHeader()
                                       .AllowAnyMethod();
                                   });
